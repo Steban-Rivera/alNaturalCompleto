@@ -1,0 +1,33 @@
+{
+  "materiasPrimas": [
+    { "id": 1, "nombre": "Aceite de coco", "costoGramo": 18, "merma": 5 },
+    { "id": 2, "nombre": "Manteca de karité", "costoGramo": 32, "merma": 3 },
+    { "id": 3, "nombre": "Aceite de almendras", "costoGramo": 22, "merma": 2 },
+    { "id": 4, "nombre": "Cera de abejas", "costoGramo": 28, "merma": 8 },
+    { "id": 5, "nombre": "Aloe vera", "costoGramo": 12, "merma": 15 }
+  ],
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Crema Hidratante Natural",
+      "ingredientes": [
+        { "mpId": 1, "gramos": 30 },
+        { "mpId": 2, "gramos": 20 },
+        { "mpId": 5, "gramos": 50 }
+      ],
+      "ganancia": 40
+    },
+    {
+      "id": 2,
+      "nombre": "Bálsamo de Labios",
+      "ingredientes": [
+        { "mpId": 1, "gramos": 10 },
+        { "mpId": 4, "gramos": 8 },
+        { "mpId": 3, "gramos": 5 }
+      ],
+      "ganancia": 50
+    }
+  ],
+  "mpNextId": 6,
+  "prodNextId": 3
+}

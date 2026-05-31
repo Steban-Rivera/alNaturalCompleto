@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Al Natural · Hecho en Casa — Costeo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ══════════════════════════
+     SPLASH
+══════════════════════════ -->
+<div id="splash-overlay">
+  <div class="splash-content">
+    <img class="spl-logo" src="logo.png" alt="Logo">
+    <div class="spl-loader"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     TOP BAR
+══════════════════════════ -->
+<div class="topbar">
+  <div class="brand">
+    <img class="brand-logo" src="logo.png" alt="Al Natural Hecho en Casa">
+    <div class="brand-text">
+      <div class="brand-name">Al Natural Hecho en Casa</div>
+      <div class="brand-sub">Control de Costeo</div>
+    </div>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showView('resumen', this)">🏠 Resumen</button>
+    <button class="nav-btn"        onclick="showView('materia', this)">🌾 Materia Prima</button>
+    <button class="nav-btn"        onclick="showView('cocina', this)">🍲 Cocina Virtual</button>
+    <button class="nav-btn"        onclick="showView('productos', this)">🧴 Productos</button>
+  </nav>
+</div>
+
+<div class="main">
+
+  <!-- ══════════════════════════
+       VISTA 1 – RESUMEN
+  ══════════════════════════ -->
+  <div id="view-resumen" class="view active">
+    <div class="section-header">
+      <div class="section-title">¡Bienvenida! 🌿</div>
+      <div class="section-sub">Aquí tienes un resumen de todo tu inventario y una guía para usar cada sección.</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🌾</div>
+        <div class="stat-label">Materias Primas</div>
+        <div class="stat-value" id="stat-mp">—</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">🧴</div>
+        <div class="stat-label">Productos registrados</div>
+        <div class="stat-value" id="stat-prod">—</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Costo promedio por producto</div>
+        <div class="stat-value" id="stat-avg">—</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-icon">📈</div>
+        <div class="stat-label">Margen promedio</div>
+        <div class="stat-value" id="stat-margin">—</div>
+      </div>
+    </div>
+
+    <div class="guide-title">📖 ¿Cómo usar esta herramienta?</div>
+    <div class="steps-grid">
+      <div class="step-card s1">
+        <div class="step-num">1</div>
+        <h3>Registra tu Materia Prima</h3>
+        <p>Ingresa cada ingrediente con su <strong>costo por unidad</strong> y <strong>% de merma</strong>. En la pestaña <em>Empaques</em> configura el costo de cada envase y la etiqueta.</p>
+        <span class="step-tag">🌾 Pestaña: Materia Prima</span>
+      </div>
+      <div class="step-card s2">
+        <div class="step-num">2</div>
+        <h3>Usa la Cocina Virtual</h3>
+        <p>Simula tu producción real: agrega los ingredientes de la "ollada", indica cuántos envases de cada tamaño llenaste y el sistema calculará el costo incluyendo envase y etiqueta.</p>
+        <span class="step-tag">🍲 Pestaña: Cocina Virtual</span>
+      </div>
+      <div class="step-card s3">
+        <div class="step-num">3</div>
+        <h3>Ajusta tu Ganancia</h3>
+        <p>En la sección de Productos, define el <strong>% de ganancia</strong> para cada producto y obtén el <strong>precio de venta sugerido</strong> automáticamente. Todos los costos se actualizan solos.</p>
+        <span class="step-tag">🧴 Pestaña: Productos</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       VISTA 2 – MATERIA PRIMA
+  ══════════════════════════ -->
+  <div id="view-materia" class="view">
+    <div class="section-header">
+      <div class="section-title">🌾 Materia Prima</div>
+      <div class="section-sub">Gestiona ingredientes y empaques. Todos los costos se reflejan automáticamente en tus productos.</div>
+    </div>
+
+    <!-- Sub-pestañas -->
+    <div class="subtabs">
+      <button class="subtab-btn active" id="subtab-ingredientes" onclick="showSubtab('ingredientes')">🌿 Ingredientes</button>
+      <button class="subtab-btn"        id="subtab-empaques"     onclick="showSubtab('empaques')">🫙 Empaques</button>
+    </div>
+
+    <!-- Sub-vista: Ingredientes -->
+    <div id="subview-ingredientes" class="subview active">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Buscar ingrediente…" oninput="filterMP(this.value)">
+        </div>
+        <button class="btn btn-primary" onclick="openModal('mp')">＋ Agregar ingrediente</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ingrediente</th>
+              <th>Costo / unidad</th>
+              <th>% Merma</th>
+              <th>Precio de la merma</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="mp-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sub-vista: Empaques -->
+    <div id="subview-empaques" class="subview">
+      <div class="toolbar">
+        <div style="color:var(--texto-soft); font-size:0.88rem; font-family:var(--font-sans);">
+          💡 El costo de envase y etiqueta se suma automáticamente al costo de cada producto.
+        </div>
+        <button class="btn btn-primary" onclick="openModal('envase')">＋ Agregar envase</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Empaque</th>
+              <th>Tamaño</th>
+              <th>Costo</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="empaques-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       VISTA 3 – COCINA VIRTUAL
+  ══════════════════════════ -->
+  <div id="view-cocina" class="view">
+    <div class="section-header">
+      <div class="section-title">🍲 Cocina Virtual</div>
+      <div class="section-sub">Simula tu producción real. Agrega los ingredientes de la olla, luego indica cuántos envases llenaste con el resultado.</div>
+    </div>
+
+    <div class="cocina-layout">
+
+      <!-- Panel izquierdo: La Olla -->
+      <div class="cocina-panel">
+        <div class="cocina-panel-title">🫕 La Olla</div>
+
+        <div class="form-group">
+          <label class="form-label">Nombre del producto</label>
+          <input type="text" class="form-input" id="cocina-nombre"
+                 placeholder="Ej: Crema hidratante, Guacamole…">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Agregar ingrediente</label>
+          <div class="cocina-ingr-row">
+            <select class="form-input" id="cocina-mp-select" style="flex:2">
+              <option value="">— Seleccionar ingrediente —</option>
+            </select>
+            <input type="number" class="form-input" id="cocina-cantidad"
+                   placeholder="Cantidad" min="0" step="0.01" style="flex:1; min-width:90px">
+            <select class="form-input" id="cocina-unidad" style="flex:0 0 70px">
+              <option value="g">g</option>
+              <option value="ml">ml</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost cocina-add-btn" onclick="agregarALaOlla()">
+            🥄 Agregar a la olla
+          </button>
+        </div>
+
+        <!-- Lista ingredientes en la olla -->
+        <div class="olla-list-wrap">
+          <div class="olla-list-title">Ingredientes en la olla</div>
+          <div id="olla-lista">
+            <div class="olla-empty">La olla está vacía. Agrega ingredientes arriba.</div>
+          </div>
+          <div class="olla-total-row" id="olla-total-row" style="display:none">
+            <span>Costo total de la olla:</span>
+            <strong id="olla-costo-total">$0</strong>
+          </div>
+        </div>
+
+        <!-- Costos indirectos -->
+        <div class="costos-ind-wrap">
+          <div class="costos-ind-title">⚙️ Costos indirectos de esta ollada</div>
+          <div class="costos-ind-hint">Suma a mano el transporte, servicios, mano de obra y demás gastos de esta producción e ingresa el total aquí. Se repartirá proporcionalmente entre todos los ml producidos.</div>
+          <div class="costos-ind-input-row">
+            <span class="costos-ind-prefix">$</span>
+            <input type="number" class="form-input costos-ind-input"
+                   id="cocina-costos-indirectos"
+                   placeholder="0" min="0" step="0.01"
+                   oninput="onCostosIndirectosChange()">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Panel derecho: Los Envases -->
+      <div class="cocina-panel">
+        <div class="cocina-panel-title">🫙 Vaciar en envases</div>
+        <div class="section-sub" style="margin-bottom:1.2rem; font-size:0.84rem;">
+          Ingresa cuántos envases de cada tamaño llenaste con esta olla. Deja en 0 los tamaños que no usaste.
+        </div>
+
+        <div class="envases-grid" id="envases-grid">
+          <!-- Rendered by JS -->
+        </div>
+
+        <!-- Resumen de la producción -->
+        <div class="produccion-resumen" id="produccion-resumen" style="display:none">
+          <div class="resumen-row">
+            <span>Total producido:</span>
+            <strong id="res-total-ml">0 ml</strong>
+          </div>
+          <div class="resumen-row">
+            <span>Costo ingredientes / ml:</span>
+            <strong id="res-costo-unidad">$0</strong>
+          </div>
+          <div class="resumen-divider"></div>
+          <div class="resumen-productos-title">Costo por envase (ingredientes + indirectos + envase + etiqueta):</div>
+          <div id="res-envases-detalle"></div>
+        </div>
+
+        <button class="btn btn-primary cocina-crear-btn" id="btn-crear-recetas" onclick="crearRecetasAutomaticamente()" style="display:none">
+          ✨ Crear recetas automáticamente
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════
+       VISTA 4 – PRODUCTOS
+  ══════════════════════════ -->
+  <div id="view-productos" class="view">
+    <div class="section-header">
+      <div class="section-title">🧴 Mis Productos</div>
+      <div class="section-sub">Aquí verás todos los productos creados desde la Cocina Virtual. Solo puedes ajustar el % de ganancia para obtener el precio de venta sugerido.</div>
+    </div>
+
+    <div class="productos-info-banner">
+      <span>💡</span>
+      <span>Las recetas se crean únicamente desde <strong>Cocina Virtual</strong>. Para modificar una receta, elimina el producto y crea uno nuevo desde la cocina.</span>
+    </div>
+
+    <div class="products-grid" id="products-grid"></div>
+  </div>
+
+</div><!-- /.main -->
+
+<!-- ══════════════════════════
+     MODAL – MATERIA PRIMA
+══════════════════════════ -->
+<div class="modal-overlay" id="modal-mp">
+  <div class="modal">
+    <div class="modal-title">🌾 <span id="mp-modal-title">Agregar Ingrediente</span></div>
+    <input type="hidden" id="mp-edit-id">
+
+    <div class="form-group">
+      <label class="form-label">Nombre del ingrediente</label>
+      <input type="text" class="form-input" id="mp-nombre"
+             placeholder="Ej: Aceite de coco, Manteca de karité…">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Costo por unidad ($)</label>
+        <input type="number" class="form-input" id="mp-costo"
+               placeholder="0.00" step="0.01" oninput="previewMP()">
+        <div class="form-hint">Precio que pagaste ÷ unidades compradas (g o ml)</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">% de Merma</label>
+        <input type="number" class="form-input" id="mp-merma"
+               placeholder="0" min="0" max="100" oninput="previewMP()">
+        <div class="form-hint">% que se pierde al procesar</div>
+      </div>
+    </div>
+
+    <div class="preview-box" id="mp-preview" style="display:none">
+      Precio de la merma: <strong id="mp-preview-val">$0.00</strong> / unidad
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost"   onclick="closeModal('mp')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveMP()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     MODAL – ENVASE
+══════════════════════════ -->
+<div class="modal-overlay" id="modal-envase">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">🫙 <span id="envase-modal-title">Agregar Envase</span></div>
+    <input type="hidden" id="envase-edit-id">
+
+    <div class="form-group" id="envase-ml-group">
+      <label class="form-label">Tamaño del envase (ml)</label>
+      <input type="number" class="form-input" id="envase-ml-input"
+             placeholder="Ej: 200" min="1" step="1">
+      <div class="form-hint">El nombre se creará automáticamente: "Envase 200ml"</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Costo del envase ($)</label>
+      <input type="number" class="form-input" id="envase-costo-input"
+             placeholder="0.00" step="0.01">
+      <div class="form-hint">Precio unitario de un envase vacío</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost"   onclick="closeModal('envase')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEnvase()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     MODAL – ETIQUETA
+══════════════════════════ -->
+<div class="modal-overlay" id="modal-etiqueta">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">🏷️ Editar precio de Etiqueta</div>
+
+    <div class="form-group">
+      <label class="form-label">Costo por etiqueta ($)</label>
+      <input type="number" class="form-input" id="etiqueta-costo-input"
+             placeholder="0.00" step="0.01">
+      <div class="form-hint">Se aplica a todos los productos por igual, sin importar el tamaño del envase.</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost"   onclick="closeModal('etiqueta')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEtiqueta()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     MODAL – EDITAR GANANCIA
+══════════════════════════ -->
+<div class="modal-overlay" id="modal-ganancia">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-title">📈 Ajustar Ganancia</div>
+    <input type="hidden" id="ganancia-prod-id">
+
+    <div class="form-group">
+      <label class="form-label">Producto</label>
+      <div id="ganancia-prod-nombre" style="font-family:var(--font-serif); font-size:1.05rem; color:var(--verde-oscuro); font-style:italic; padding: 6px 0;"></div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">% de Ganancia deseada</label>
+      <input type="number" class="form-input" id="ganancia-valor"
+             placeholder="Ej: 35" min="0" max="500" oninput="previewGanancia()">
+      <div class="form-hint">Define cuánto deseas ganar sobre el costo de producción</div>
+    </div>
+
+    <div class="preview-box" id="ganancia-preview" style="display:none">
+      Precio sugerido de venta: <strong id="ganancia-precio-val" style="color:var(--verde-oscuro)">$0</strong>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost"   onclick="closeModal('ganancia')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveGanancia()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════
+     MODAL – CONFIRMAR DUPLICADO
+══════════════════════════ -->
+<div class="modal-overlay" id="modal-duplicado">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">⚠️ Producto ya existe</div>
+    <div id="duplicado-mensaje" style="font-family:var(--font-sans); font-size:0.92rem; color:var(--texto-mid); line-height:1.6; margin-bottom:1.5rem;"></div>
+    <div id="duplicado-lista" style="margin-bottom:1.5rem;"></div>
+    <div class="modal-actions" style="justify-content:space-between; flex-wrap:wrap; gap:8px">
+      <button class="btn btn-ghost" onclick="closeModal('duplicado')">Cancelar — no crear</button>
+      <button class="btn btn-danger-solid" onclick="confirmarReemplazoDuplicados()">🔄 Sí, reemplazar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ <span id="toast-msg">Guardado</span></div>
+
+<script src="main.js"></script>
+</body>
+</html>
